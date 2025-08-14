@@ -1,0 +1,176 @@
+'use client';
+
+import { Clock, HandHeart, Target, TrendingUp } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import AppleTimelineCard from './AppleTimelineCard';
+
+interface AppleTimelineProps {
+  isVisible: boolean;
+}
+
+const AppleTimeline = ({ isVisible }: AppleTimelineProps) => {
+  // Use will-change for performance optimization
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isVisible && timelineRef.current) {
+      // Remove will-change after animations complete for better performance
+      const timer = setTimeout(() => {
+        if (timelineRef.current) {
+          timelineRef.current.style.willChange = 'auto';
+        }
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+    
+    // Always return a cleanup function, even if no timer was set
+    return () => {};
+  }, [isVisible]);
+
+  const steps = [
+    {
+      id: 1,
+      number: "01",
+      title: "Snelheid zonder concessies",
+      subtitle: "We bouwen in dagen waar andere maanden over doen. Snelheid is niet optioneel.",
+      icon: Clock,
+      glowColor: "from-blue-500/20 to-cyan-400/15", // AI Automations blue
+      glowColorHover: "from-blue-500/35 to-cyan-400/25",
+    },
+    {
+      id: 2,
+      number: "02",
+      title: "Ownership mentaliteit",
+      subtitle: "Jullie succes is ons succes. We bouwen voor jullie alsof het ons eigen bedrijf is.",
+      icon: HandHeart,
+      glowColor: "from-purple-500/20 to-violet-400/15", // Custom SaaS purple
+      glowColorHover: "from-purple-500/35 to-violet-400/25",
+    },
+    {
+      id: 3,
+      number: "03",
+      title: "High standards",
+      subtitle: "Perfect is het vertrekpunt. We leveren niets wat we zelf niet zouden gebruiken.",
+      icon: Target,
+      glowColor: "from-purple-400/20 to-blue-500/15", // Consultancy purple-blue
+      glowColorHover: "from-purple-400/35 to-blue-500/25",
+    },
+    {
+      id: 4,
+      number: "04",
+      title: "Functionele creativiteit",
+      subtitle: "AI zonder creativiteit is kracht zonder richting. Wij sturen die kracht met visie.",
+      icon: TrendingUp,
+      glowColor: "from-green-500/20 to-blue-600/15", // Autonomous Agents green-blue
+      glowColorHover: "from-green-500/35 to-blue-600/25",
+    }
+  ];
+
+  return (
+    <div ref={timelineRef} className="relative max-w-5xl mx-auto" style={{ willChange: isVisible ? 'auto' : 'transform' }}>
+      {/* Subtle central timeline line */}
+      <div className="absolute left-1/2 top-0 bottom-0 transform -translate-x-0.5 w-px">
+        {/* Base line with gentle fade-in */}
+        <div className={`w-full h-full bg-gradient-to-b from-transparent via-white/15 to-transparent transition-all duration-1500 ease-out ${
+          isVisible ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0'
+        }`}
+        style={{
+          transitionDelay: '600ms',
+          transformOrigin: 'top',
+          transitionTimingFunction: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+        }} />
+
+        {/* Subtle animated glow - synchronized with cards */}
+        <div className={`absolute inset-0 w-full h-full transition-opacity duration-2000 ease-out ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}
+        style={{ transitionDelay: '800ms' }}
+        >
+          <div
+            className="w-full h-12 bg-gradient-to-b from-cyan-400/15 via-white/20 to-transparent blur-sm"
+            style={{
+              animation: isVisible ? 'subtleTimelineGlow 25s ease-in-out infinite' : 'none',
+              transformOrigin: 'top',
+              animationDelay: '1500ms'
+            }}
+          />
+        </div>
+
+        {/* Timeline dots with synchronized entrance */}
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className="absolute left-1/2 transform -translate-x-1/2"
+            style={{
+              top: `${12 + (index * 18)}%`,
+            }}
+          >
+            <div className="relative opacity-100 scale-100">
+              <div className="w-2.5 h-2.5 rounded-full shadow-lg border bg-gradient-to-br from-white/70 to-white/30 shadow-white/10 border-white/30">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-400/30 to-transparent opacity-100" />
+              </div>
+              {/* Subtle outer glow */}
+              <div className="absolute inset-0 w-2.5 h-2.5 rounded-full blur-sm scale-125 opacity-50 bg-white/10 opacity-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Timeline cards with no entrance animations */}
+      <div className="relative z-10 space-y-8 lg:space-y-10">
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className="opacity-100 translate-y-0 blur-none"
+          >
+            <AppleTimelineCard
+              step={step}
+              isLeft={index % 2 === 0}
+              delay={0}
+              isVisible={true}
+              cardIndex={index}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Enhanced timeline glow animation */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          @keyframes subtleTimelineGlow {
+            0%, 100% {
+              transform: translateY(-100%);
+              opacity: 0;
+            }
+            3% {
+              opacity: 0.15;
+            }
+            10% {
+              opacity: 0.35;
+              transform: translateY(-60%);
+            }
+            25% {
+              opacity: 0.65;
+              transform: translateY(0%);
+            }
+            75% {
+              opacity: 0.45;
+              transform: translateY(60%);
+            }
+            90% {
+              opacity: 0.15;
+              transform: translateY(90%);
+            }
+            97%, 100% {
+              opacity: 0;
+              transform: translateY(100vh);
+            }
+          }
+        `
+      }} />
+    </div>
+  );
+};
+
+export default AppleTimeline;
